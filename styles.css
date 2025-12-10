@@ -20,8 +20,49 @@ body {
     text-align: center;
     color: white;
     font-size: 2.5rem;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.connection-status {
+    text-align: center;
+    padding: 12px 20px;
+    margin: 0 auto 20px;
+    border-radius: 8px;
+    max-width: 600px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    animation: fadeIn 0.3s;
+}
+
+.connection-status.connected {
+    background-color: rgba(76, 175, 80, 0.9);
+    color: white;
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+.connection-status.disconnected {
+    background-color: rgba(244, 67, 54, 0.9);
+    color: white;
+    box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
+}
+
+.connection-status small {
+    display: block;
+    margin-top: 5px;
+    font-size: 0.85rem;
+    opacity: 0.9;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .week-section {
