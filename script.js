@@ -50,10 +50,10 @@ const SHIFT_STATES = {
 };
 
 const SHIFT_LABELS = {
-    [SHIFT_STATES.UNSCHEDULED]: '未排班',
+    [SHIFT_STATES.UNSCHEDULED]: '',
     [SHIFT_STATES.FULLDAY]: '',
-    [SHIFT_STATES.MORNING]: '上午班',
-    [SHIFT_STATES.AFTERNOON]: '下午班'
+    [SHIFT_STATES.MORNING]: '(上午)',
+    [SHIFT_STATES.AFTERNOON]: '(下午)'
 };
 
 // 狀態切換順序
@@ -157,8 +157,7 @@ function createEmployeeCard(weekNum, dayIndex, employee) {
     card.innerHTML = `
         <div class="employee-label">${employee.label}</div>
         <div class="employee-info">
-            <div class="employee-name">${employee.name}</div>
-            <div class="shift-label">${SHIFT_LABELS[SHIFT_STATES.UNSCHEDULED]}</div>
+            <div class="employee-name">${employee.name}<span class="shift-label">${SHIFT_LABELS[SHIFT_STATES.UNSCHEDULED]}</span></div>
         </div>
     `;
 
@@ -398,11 +397,11 @@ async function loadScheduleData() {
     if (db && firebaseInitialized) {
         db.collection('schedules').doc('current').onSnapshot(
             (doc) => {
-                if (doc.exists) {
-                    const newData = doc.data();
-                    // 只在資料真的改變時才更新
-                    if (JSON.stringify(newData) !== JSON.stringify(scheduleData)) {
-                        applyScheduleData(newData);
+            if (doc.exists) {
+                const newData = doc.data();
+                // 只在資料真的改變時才更新
+                if (JSON.stringify(newData) !== JSON.stringify(scheduleData)) {
+                    applyScheduleData(newData);
                         console.log('🔄 接收到雲端更新');
                     }
                 }
