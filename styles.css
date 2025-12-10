@@ -1,0 +1,435 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.main-title {
+    text-align: center;
+    color: white;
+    font-size: 2.5rem;
+    margin-bottom: 30px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.week-section {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.week-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.week-title-group h2 {
+    font-size: 1.8rem;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.date-input-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.date-input {
+    padding: 8px 12px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition: border-color 0.3s;
+}
+
+.date-input:hover,
+.date-input:focus {
+    border-color: #667eea;
+    outline: none;
+}
+
+.date-range {
+    color: #666;
+    font-size: 0.95rem;
+}
+
+.week-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.cleaner-select-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.cleaner-select-group label {
+    color: #666;
+    font-size: 0.95rem;
+}
+
+.cleaner-select {
+    padding: 8px 12px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: inherit;
+    cursor: pointer;
+    min-width: 120px;
+    transition: all 0.3s;
+}
+
+.cleaner-select:hover,
+.cleaner-select:focus {
+    border-color: #667eea;
+    outline: none;
+}
+
+.cleaner-select.selected-星貞 {
+    background-color: #e8f5e9;
+    border-color: #81c784;
+}
+
+.cleaner-select.selected-國渝 {
+    background-color: #fff9e6;
+    border-color: #ffb74d;
+}
+
+.cleaner-select.selected-樹穎 {
+    background-color: #e8eaf6;
+    border-color: #9fa8da;
+}
+
+.clear-btn {
+    padding: 8px 20px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-weight: 500;
+}
+
+.clear-btn:hover {
+    background-color: #d32f2f;
+}
+
+.schedule-container {
+    display: flex;
+    gap: 15px;
+    overflow-x: auto;
+}
+
+.schedule-table {
+    display: flex;
+    gap: 15px;
+    flex: 1;
+    min-width: 800px;
+}
+
+.day-column {
+    flex: 1;
+    min-width: 150px;
+}
+
+.day-header {
+    background: #f5f5f5;
+    padding: 12px;
+    border-radius: 8px 8px 0 0;
+    text-align: center;
+    border: 1px solid #e0e0e0;
+    border-bottom: none;
+}
+
+.day-name {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.day-date {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #333;
+}
+
+.employee-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px;
+    background: #fafafa;
+    border: 1px solid #e0e0e0;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+}
+
+.employee-card {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    border-left: 4px solid transparent;
+}
+
+.employee-card:hover {
+    transform: translateX(2px);
+}
+
+/* 未排班狀態 */
+.employee-card.unscheduled {
+    background-color: #e0e0e0;
+    border-left-color: #bdbdbd;
+}
+
+.employee-card.unscheduled .employee-name {
+    color: #9e9e9e;
+}
+
+.employee-card.unscheduled .shift-label {
+    color: #bdbdbd;
+}
+
+/* 星貞的配色 (綠色) */
+.employee-card.星貞.fullday {
+    background-color: #a5d6a7;
+    border-left-color: #4caf50;
+}
+
+.employee-card.星貞.morning,
+.employee-card.星貞.afternoon {
+    background-color: #c8e6c9;
+    border-left-color: #4caf50;
+}
+
+.employee-card.星貞 .employee-name {
+    color: #2e7d32;
+}
+
+/* 國渝的配色 (橘黃色) */
+.employee-card.國渝.fullday {
+    background-color: #ffcc80;
+    border-left-color: #ff9800;
+}
+
+.employee-card.國渝.morning,
+.employee-card.國渝.afternoon {
+    background-color: #ffe0b2;
+    border-left-color: #ff9800;
+}
+
+.employee-card.國渝 .employee-name {
+    color: #e65100;
+}
+
+/* 樹穎的配色 (藍紫色) */
+.employee-card.樹穎.fullday {
+    background-color: #9fa8da;
+    border-left-color: #5c6bc0;
+}
+
+.employee-card.樹穎.morning,
+.employee-card.樹穎.afternoon {
+    background-color: #c5cae9;
+    border-left-color: #5c6bc0;
+}
+
+.employee-card.樹穎 .employee-name {
+    color: #283593;
+}
+
+.employee-label {
+    width: 32px;
+    height: 32px;
+    background-color: white;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-right: 10px;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.employee-info {
+    flex: 1;
+}
+
+.employee-name {
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 2px;
+}
+
+.shift-label {
+    font-size: 0.85rem;
+    color: #d32f2f;
+    font-weight: 500;
+}
+
+.notes-column {
+    width: 200px;
+    flex-shrink: 0;
+}
+
+.notes-header {
+    background: #f5f5f5;
+    padding: 12px;
+    border-radius: 8px 8px 0 0;
+    text-align: center;
+    border: 1px solid #e0e0e0;
+    border-bottom: none;
+    font-weight: 600;
+    color: #333;
+}
+
+.notes-textarea {
+    width: 100%;
+    height: 280px;
+    padding: 12px;
+    border: 1px solid #e0e0e0;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    resize: vertical;
+    transition: border-color 0.3s;
+}
+
+.notes-textarea:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+/* 響應式設計 */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    .main-title {
+        font-size: 1.8rem;
+        margin-bottom: 20px;
+    }
+
+    .week-section {
+        padding: 16px;
+    }
+
+    .week-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .week-title-group h2 {
+        font-size: 1.5rem;
+    }
+
+    .week-controls {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .cleaner-select-group {
+        width: 100%;
+    }
+
+    .cleaner-select {
+        flex: 1;
+    }
+
+    .clear-btn {
+        width: 100%;
+    }
+
+    .schedule-container {
+        flex-direction: column;
+    }
+
+    .schedule-table {
+        overflow-x: auto;
+        padding-bottom: 10px;
+    }
+
+    .notes-column {
+        width: 100%;
+    }
+
+    .notes-textarea {
+        height: 150px;
+    }
+}
+
+@media (max-width: 480px) {
+    .day-column {
+        min-width: 130px;
+    }
+
+    .employee-card {
+        padding: 10px;
+    }
+
+    .employee-label {
+        width: 28px;
+        height: 28px;
+        font-size: 0.8rem;
+    }
+
+    .employee-name {
+        font-size: 0.9rem;
+    }
+
+    .shift-label {
+        font-size: 0.8rem;
+    }
+}
+
+/* 滾動條樣式 */
+.schedule-container::-webkit-scrollbar {
+    height: 8px;
+}
+
+.schedule-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.schedule-container::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.schedule-container::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+

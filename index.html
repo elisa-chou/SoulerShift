@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>寫樂排班表</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="main-title">寫樂排班表</h1>
+        
+        <!-- 第一週 -->
+        <div class="week-section">
+            <div class="week-header">
+                <div class="week-title-group">
+                    <h2>第 1 週排班</h2>
+                    <div class="date-input-group">
+                        <input type="date" id="week1-start" class="date-input" placeholder="選擇開始日期">
+                        <span class="date-range" id="week1-range"></span>
+                    </div>
+                </div>
+                <div class="week-controls">
+                    <div class="cleaner-select-group">
+                        <label>本週打掃</label>
+                        <select id="week1-cleaner" class="cleaner-select">
+                            <option value="">尚未指定</option>
+                            <option value="星貞">星貞</option>
+                            <option value="國渝">國渝</option>
+                            <option value="樹穎">樹穎</option>
+                        </select>
+                    </div>
+                    <button class="clear-btn" onclick="clearWeek(1)">清空</button>
+                </div>
+            </div>
+            
+            <div class="schedule-container">
+                <div class="schedule-table" id="week1-schedule">
+                    <!-- 週一到週五的班表 -->
+                </div>
+                <div class="notes-column">
+                    <div class="notes-header">備註</div>
+                    <textarea id="week1-notes" class="notes-textarea" placeholder="輸入備註..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第二週 -->
+        <div class="week-section">
+            <div class="week-header">
+                <div class="week-title-group">
+                    <h2>第 2 週排班</h2>
+                    <div class="date-input-group">
+                        <input type="date" id="week2-start" class="date-input" placeholder="選擇開始日期">
+                        <span class="date-range" id="week2-range"></span>
+                    </div>
+                </div>
+                <div class="week-controls">
+                    <div class="cleaner-select-group">
+                        <label>本週打掃</label>
+                        <select id="week2-cleaner" class="cleaner-select">
+                            <option value="">尚未指定</option>
+                            <option value="星貞">星貞</option>
+                            <option value="國渝">國渝</option>
+                            <option value="樹穎">樹穎</option>
+                        </select>
+                    </div>
+                    <button class="clear-btn" onclick="clearWeek(2)">清空</button>
+                </div>
+            </div>
+            
+            <div class="schedule-container">
+                <div class="schedule-table" id="week2-schedule">
+                    <!-- 週一到週五的班表 -->
+                </div>
+                <div class="notes-column">
+                    <div class="notes-header">備註</div>
+                    <textarea id="week2-notes" class="notes-textarea" placeholder="輸入備註..."></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    
+    <!-- 自定義腳本 -->
+    <script src="script.js"></script>
+</body>
+</html>
+
