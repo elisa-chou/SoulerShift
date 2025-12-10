@@ -10,12 +10,28 @@ const firebaseConfig = {
 
 // 初始化 Firebase
 let db;
+let firebaseInitialized = false;
 try {
     firebase.initializeApp(firebaseConfig);
     db = firebase.firestore();
-    console.log("Firebase 已初始化");
+    firebaseInitialized = true;
+    console.log("✅ Firebase 已成功初始化");
+    
+    // 測試連線
+    db.collection('schedules').doc('current').get()
+        .then(() => {
+            console.log("✅ Firestore 連線測試成功");
+            showConnectionStatus(true);
+        })
+        .catch((error) => {
+            console.error("❌ Firestore 連線失敗:", error);
+            console.error("錯誤代碼:", error.code);
+            console.error("錯誤訊息:", error.message);
+            showConnectionStatus(false, error.message);
+        });
 } catch (error) {
-    console.warn("Firebase 初始化失敗，將使用本地儲存模式", error);
+    console.warn("❌ Firebase 初始化失敗，將使用本地儲存模式", error);
+    showConnectionStatus(false, "Firebase 初始化失敗");
 }
 
 // 員工資料
@@ -63,6 +79,21 @@ let scheduleData = {
         schedule: {}
     }
 };
+
+// 顯示連線狀態
+function showConnectionStatus(isConnected, errorMessage = '') {
+    const statusIndicator = document.getElementById('connection-status');
+    if (!statusIndicator) return;
+    
+    if (isConnected) {
+        statusIndicator.innerHTML = '🟢 雲端同步已連線';
+        statusIndicator.className = 'connection-status connected';
+    } else {
+        statusIndicator.innerHTML = `🔴 雲端同步失敗 - 使用本地模式${errorMessage ? '<br><small>' + errorMessage + '</small>' : ''}`;
+        statusIndicator.className = 'connection-status disconnected';
+    }
+    statusIndicator.style.display = 'block';
+}
 
 // 初始化
 document.addEventListener('DOMContentLoaded', () => {
@@ -307,19 +338,24 @@ async function saveScheduleData() {
     const data = collectScheduleData();
     scheduleData = data;
 
+    // 先儲存到本地儲存（作為備份）
+    localStorage.setItem('scheduleData', JSON.stringify(data));
+
     // 儲存到 Firebase
-    if (db) {
+    if (db && firebaseInitialized) {
         try {
             await db.collection('schedules').doc('current').set(data);
-            console.log('資料已同步至雲端');
+            console.log('✅ 資料已同步至雲端');
         } catch (error) {
-            console.error('雲端儲存失敗:', error);
-            // 回退到本地儲存
-            localStorage.setItem('scheduleData', JSON.stringify(data));
+            console.error('❌ 雲端儲存失敗:', error);
+            console.error('錯誤代碼:', error.code);
+            console.error('錯誤訊息:', error.message);
+            
+            // 顯示錯誤提示
+            if (error.code === 'permission-denied') {
+                alert('⚠️ Firebase 權限被拒絕\n\n請確認：\n1. Firestore 資料庫已啟用\n2. 安全規則已正確設定\n\n目前資料僅保存在本地瀏覽器中。');
+            }
         }
-    } else {
-        // 儲存到本地儲存
-        localStorage.setItem('scheduleData', JSON.stringify(data));
     }
 }
 
@@ -328,15 +364,19 @@ async function loadScheduleData() {
     let data = null;
 
     // 從 Firebase 載入
-    if (db) {
+    if (db && firebaseInitialized) {
         try {
             const doc = await db.collection('schedules').doc('current').get();
             if (doc.exists) {
                 data = doc.data();
-                console.log('從雲端載入資料');
+                console.log('✅ 從雲端載入資料');
+            } else {
+                console.log('ℹ️ 雲端尚無資料');
             }
         } catch (error) {
-            console.error('雲端載入失敗:', error);
+            console.error('❌ 雲端載入失敗:', error);
+            console.error('錯誤代碼:', error.code);
+            console.error('錯誤訊息:', error.message);
         }
     }
 
@@ -345,7 +385,7 @@ async function loadScheduleData() {
         const localData = localStorage.getItem('scheduleData');
         if (localData) {
             data = JSON.parse(localData);
-            console.log('從本地儲存載入資料');
+            console.log('ℹ️ 從本地儲存載入資料');
         }
     }
 
@@ -355,17 +395,24 @@ async function loadScheduleData() {
     }
 
     // 設置即時監聽 (如果使用 Firebase)
-    if (db) {
-        db.collection('schedules').doc('current').onSnapshot((doc) => {
-            if (doc.exists) {
-                const newData = doc.data();
-                // 只在資料真的改變時才更新
-                if (JSON.stringify(newData) !== JSON.stringify(scheduleData)) {
-                    applyScheduleData(newData);
-                    console.log('接收到雲端更新');
+    if (db && firebaseInitialized) {
+        db.collection('schedules').doc('current').onSnapshot(
+            (doc) => {
+                if (doc.exists) {
+                    const newData = doc.data();
+                    // 只在資料真的改變時才更新
+                    if (JSON.stringify(newData) !== JSON.stringify(scheduleData)) {
+                        applyScheduleData(newData);
+                        console.log('🔄 接收到雲端更新');
+                    }
                 }
+            },
+            (error) => {
+                console.error('❌ 即時監聽失敗:', error);
+                console.error('錯誤代碼:', error.code);
+                console.error('錯誤訊息:', error.message);
             }
-        });
+        );
     }
 }
 
