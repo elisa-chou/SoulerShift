@@ -36,15 +36,15 @@ body {
 }
 
 .connection-status.connected {
-    background-color: rgba(76, 175, 80, 0.9);
+    background-color: #4caf50;
     color: white;
-    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
 }
 
 .connection-status.disconnected {
-    background-color: rgba(244, 67, 54, 0.9);
+    background-color: #f44336;
     color: white;
-    box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
+    box-shadow: 0 4px 12px rgba(244, 67, 54, 0.4);
 }
 
 .connection-status small {
