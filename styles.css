@@ -271,7 +271,9 @@ body {
     border-left-color: #4caf50;
 }
 
-.employee-card.星貞 .employee-name {
+.employee-card.星貞.fullday .employee-name,
+.employee-card.星貞.morning .employee-name,
+.employee-card.星貞.afternoon .employee-name {
     color: #2e7d32;
 }
 
@@ -287,7 +289,9 @@ body {
     border-left-color: #ff9800;
 }
 
-.employee-card.國渝 .employee-name {
+.employee-card.國渝.fullday .employee-name,
+.employee-card.國渝.morning .employee-name,
+.employee-card.國渝.afternoon .employee-name {
     color: #e65100;
 }
 
@@ -303,7 +307,9 @@ body {
     border-left-color: #5c6bc0;
 }
 
-.employee-card.樹穎 .employee-name {
+.employee-card.樹穎.fullday .employee-name,
+.employee-card.樹穎.morning .employee-name,
+.employee-card.樹穎.afternoon .employee-name {
     color: #283593;
 }
 
@@ -328,6 +334,7 @@ body {
 .employee-name {
     font-weight: 600;
     font-size: 1rem;
+    color: #9e9e9e; /* 預設灰色，有排班時才顯示顏色 */
 }
 
 .shift-label {
@@ -474,5 +481,6 @@ body {
 .schedule-container::-webkit-scrollbar-thumb:hover {
     background: #555;
 }
+
 
 
