@@ -271,6 +271,12 @@ function clearWeek(weekNum) {
         return;
     }
 
+    // 如果是清空第一週，將第二週的資料移到第一週
+    if (weekNum === 1) {
+        moveWeek2ToWeek1();
+        return;
+    }
+
     // 清空日期
     document.getElementById(`week${weekNum}-start`).value = '';
     updateWeekDates(weekNum, '');
@@ -295,6 +301,89 @@ function clearWeek(weekNum) {
 
     // 儲存資料
     saveScheduleData();
+}
+
+// 將第二週的資料移到第一週，清空第二週
+function moveWeek2ToWeek1() {
+    // 先收集第二週的資料
+    const week2Data = {
+        startDate: document.getElementById('week2-start').value,
+        cleaner: document.getElementById('week2-cleaner').value,
+        notes: document.getElementById('week2-notes').value,
+        schedule: {}
+    };
+
+    // 收集第二週的排班狀態
+    for (let day = 1; day <= 5; day++) {
+        employees.forEach(employee => {
+            const card = document.querySelector(
+                `[data-week="2"][data-day="${day}"][data-employee="${employee.name}"]`
+            );
+            if (card) {
+                const key = `day${day}-${employee.name}`;
+                week2Data.schedule[key] = card.dataset.state;
+            }
+        });
+    }
+
+    // 將第二週的資料套用到第一週
+    // 設定日期
+    document.getElementById('week1-start').value = week2Data.startDate;
+    updateWeekDates(1, week2Data.startDate);
+
+    // 設定打掃人員
+    const cleaner1Select = document.getElementById('week1-cleaner');
+    cleaner1Select.value = week2Data.cleaner;
+    updateCleanerStyle(cleaner1Select, week2Data.cleaner);
+
+    // 設定備註
+    document.getElementById('week1-notes').value = week2Data.notes;
+
+    // 設定排班狀態
+    for (let day = 1; day <= 5; day++) {
+        employees.forEach(employee => {
+            const key = `day${day}-${employee.name}`;
+            const state = week2Data.schedule[key] || SHIFT_STATES.UNSCHEDULED;
+            
+            const card = document.querySelector(
+                `[data-week="1"][data-day="${day}"][data-employee="${employee.name}"]`
+            );
+            
+            if (card) {
+                card.dataset.state = state;
+                STATE_CYCLE.forEach(s => card.classList.remove(s));
+                card.classList.add(state);
+                const shiftLabel = card.querySelector('.shift-label');
+                shiftLabel.textContent = SHIFT_LABELS[state];
+            }
+        });
+    }
+
+    // 清空第二週
+    document.getElementById('week2-start').value = '';
+    updateWeekDates(2, '');
+
+    const cleaner2Select = document.getElementById('week2-cleaner');
+    cleaner2Select.value = '';
+    updateCleanerStyle(cleaner2Select, '');
+
+    document.getElementById('week2-notes').value = '';
+
+    // 重置第二週所有員工卡片
+    const week2Cards = document.querySelectorAll('[data-week="2"]');
+    week2Cards.forEach(card => {
+        card.dataset.state = SHIFT_STATES.UNSCHEDULED;
+        STATE_CYCLE.forEach(state => card.classList.remove(state));
+        card.classList.add('unscheduled');
+        const shiftLabel = card.querySelector('.shift-label');
+        shiftLabel.textContent = SHIFT_LABELS[SHIFT_STATES.UNSCHEDULED];
+    });
+
+    // 儲存資料
+    saveScheduleData();
+    
+    // 提示用戶
+    console.log('第二週資料已移至第一週');
 }
 
 // 收集當前班表資料
