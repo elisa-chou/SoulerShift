@@ -39,8 +39,9 @@ function saveAuthentication() {
 // 從 Firebase 載入密碼
 async function loadPasswordFromFirebase() {
     if (!db) {
-        console.error('Firebase 未初始化，使用預設密碼');
-        return 'souler'; // 備用密碼
+        console.error('❌ Firebase 未初始化，無法載入密碼');
+        alert('系統錯誤：Firebase 未初始化\n請聯絡管理員');
+        return null;
     }
     
     try {
@@ -49,14 +50,15 @@ async function loadPasswordFromFirebase() {
             console.log('✅ 從 Firebase 載入密碼');
             return doc.data().password;
         } else {
-            // 如果 Firebase 中沒有密碼，設定預設密碼
-            console.log('⚠️ Firebase 中無密碼設定，使用並儲存預設密碼');
-            await db.collection('config').doc('auth').set({ password: 'souler' });
-            return 'souler';
+            // 如果 Firebase 中沒有密碼，顯示錯誤
+            console.error('❌ Firebase 中無密碼設定');
+            alert('系統錯誤：未設定密碼\n請聯絡管理員在 Firebase 中設定密碼');
+            return null;
         }
     } catch (error) {
         console.error('❌ 載入密碼失敗:', error);
-        return 'souler'; // 備用密碼
+        alert('系統錯誤：無法載入密碼\n' + error.message + '\n請聯絡管理員');
+        return null;
     }
 }
 
@@ -75,6 +77,14 @@ async function initPasswordProtection() {
     
     // 從 Firebase 載入密碼
     CORRECT_PASSWORD = await loadPasswordFromFirebase();
+    
+    // 如果密碼載入失敗，顯示錯誤並停止
+    if (!CORRECT_PASSWORD) {
+        errorDiv.textContent = '❌ 系統錯誤：無法載入密碼設定';
+        input.disabled = true;
+        submitBtn.disabled = true;
+        return;
+    }
     
     // 如果已經通過驗證，隱藏遮罩
     if (checkAuthentication()) {
