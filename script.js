@@ -1,3 +1,127 @@
+// 密碼保護功能
+const AUTH_STORAGE_KEY = 'soulershift_auth';
+const AUTH_EXPIRY_DAYS = 30;
+let CORRECT_PASSWORD = null; // 從 Firebase 讀取
+
+// 檢查是否已經通過驗證
+function checkAuthentication() {
+    const authData = localStorage.getItem(AUTH_STORAGE_KEY);
+    
+    if (authData) {
+        try {
+            const { timestamp } = JSON.parse(authData);
+            const now = new Date().getTime();
+            const expiryTime = AUTH_EXPIRY_DAYS * 24 * 60 * 60 * 1000; // 30天轉換為毫秒
+            
+            // 檢查是否在30天內
+            if (now - timestamp < expiryTime) {
+                return true;
+            } else {
+                // 已過期，清除驗證資料
+                localStorage.removeItem(AUTH_STORAGE_KEY);
+            }
+        } catch (e) {
+            localStorage.removeItem(AUTH_STORAGE_KEY);
+        }
+    }
+    
+    return false;
+}
+
+// 儲存驗證狀態
+function saveAuthentication() {
+    const authData = {
+        timestamp: new Date().getTime()
+    };
+    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(authData));
+}
+
+// 從 Firebase 載入密碼
+async function loadPasswordFromFirebase() {
+    if (!db) {
+        console.error('Firebase 未初始化，使用預設密碼');
+        return 'souler'; // 備用密碼
+    }
+    
+    try {
+        const doc = await db.collection('config').doc('auth').get();
+        if (doc.exists && doc.data().password) {
+            console.log('✅ 從 Firebase 載入密碼');
+            return doc.data().password;
+        } else {
+            // 如果 Firebase 中沒有密碼，設定預設密碼
+            console.log('⚠️ Firebase 中無密碼設定，使用並儲存預設密碼');
+            await db.collection('config').doc('auth').set({ password: 'souler' });
+            return 'souler';
+        }
+    } catch (error) {
+        console.error('❌ 載入密碼失敗:', error);
+        return 'souler'; // 備用密碼
+    }
+}
+
+// 初始化密碼保護
+async function initPasswordProtection() {
+    const overlay = document.getElementById('password-overlay');
+    const input = document.getElementById('password-input');
+    const submitBtn = document.getElementById('password-submit');
+    const errorDiv = document.getElementById('password-error');
+    
+    // 確保元素存在
+    if (!overlay || !input || !submitBtn || !errorDiv) {
+        console.error('❌ 密碼保護元素未找到');
+        return;
+    }
+    
+    // 從 Firebase 載入密碼
+    CORRECT_PASSWORD = await loadPasswordFromFirebase();
+    
+    // 如果已經通過驗證，隱藏遮罩
+    if (checkAuthentication()) {
+        overlay.classList.add('hidden');
+        return;
+    }
+    
+    // 密碼驗證函數
+    function verifyPassword() {
+        const password = input.value.trim();
+        
+        if (password === CORRECT_PASSWORD) {
+            // 密碼正確
+            saveAuthentication();
+            overlay.classList.add('hidden');
+            errorDiv.textContent = '';
+            console.log('✅ 驗證成功');
+        } else {
+            // 密碼錯誤
+            errorDiv.textContent = '❌ 密碼錯誤，請重試';
+            input.value = '';
+            input.focus();
+            
+            // 添加晃動動畫
+            input.style.animation = 'none';
+            setTimeout(() => {
+                input.style.animation = '';
+            }, 10);
+        }
+    }
+    
+    // 點擊確認按鈕
+    submitBtn.addEventListener('click', verifyPassword);
+    
+    // 按下 Enter 鍵
+    input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            verifyPassword();
+        }
+    });
+    
+    // 自動聚焦輸入框
+    setTimeout(() => {
+        input.focus();
+    }, 300);
+}
+
 // Firebase 配置
 const firebaseConfig = {
     apiKey: "AIzaSyDeotcJAbPety_DjOf0rN0LEHEGP1PxMiQ",
@@ -96,7 +220,17 @@ function showConnectionStatus(isConnected, errorMessage = '') {
 }
 
 // 初始化
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    // 等待 Firebase 初始化（給它一點時間）
+    if (!firebaseInitialized) {
+        console.log('⏳ 等待 Firebase 初始化...');
+        await new Promise(resolve => setTimeout(resolve, 500));
+    }
+    
+    // 初始化密碼保護（會等待密碼從 Firebase 載入）
+    await initPasswordProtection();
+    
+    // 密碼驗證後才初始化其他功能
     initWeekSchedule(1);
     initWeekSchedule(2);
     loadScheduleData();
